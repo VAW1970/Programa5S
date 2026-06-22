@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Auditoria #{{ auditoria.id }} - Programa 5S{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>📋 Auditoria #{{ auditoria.id }}</h1>
+        <p>{{ auditoria.setor_nome }} — {{ auditoria.data_auditoria }}</p>
+    </div>
+    <div style="display:flex; gap:8px;">
+        <a href="{{ url_for('relatorio', setor_id=auditoria.setor_id) }}" class="btn btn-outline">📄 Relatório</a>
+        <form method="POST" action="{{ url_for('excluir_auditoria', id=auditoria.id) }}" style="display:inline;" onsubmit="return confirm('Excluir esta auditoria?')">
+            <button type="submit" class="btn btn-danger btn-sm">🗑️ Excluir</button>
+        </form>
+        <a href="{{ url_for('listar_auditorias') }}" class="btn btn-outline">← Voltar</a>
+    </div>
+</div>
+
+<!-- ─── Info Geral ─────────────────────────────────────────────────── -->
+<div class="card">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon blue">🏢</div>
+            <div>
+                <div class="stat-value" style="font-size:18px;">{{ auditoria.setor_nome }}</div>
+                <div class="stat-label">Setor</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green">👤</div>
+            <div>
+                <div class="stat-value" style="font-size:18px;">{{ auditoria.responsavel_nome }}</div>
+                <div class="stat-label">Responsável</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon orange">🔍</div>
+            <div>
+                <div class="stat-value" style="font-size:18px;">{{ auditoria.auditor }}</div>
+                <div class="stat-label">Auditor</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon purple">📅</div>
+            <div>
+                <div class="stat-value" style="font-size:18px;">{{ auditoria.data_auditoria }}</div>
+                <div class="stat-label">Data</div>
+            </div>
+        </div>
+    </div>
+    {% if auditoria.observacoes %}
+    <div style="padding:12px 16px; background:#f8f9fc; border-radius:8px; font-size:14px; color:var(--text-muted);">
+        <strong>Observações:</strong> {{ auditoria.observacoes }}
+    </div>
+    {% endif %}
+</div>
+
+<!-- ─── Média Geral ────────────────────────────────────────────────── -->
+{% set soma_total = namespace(v=0) %}
+{% set count_total = namespace(v=0) %}
+{% for senso, media in medias_sensos.items() %}
+    {% set soma_total.v = soma_total.v + (media * itens_por_senso[senso]|length) %}
+    {% set count_total.v = count_total.v + itens_por_senso[senso]|length %}
+{% endfor %}
+{% set media_geral = (soma_total.v / count_total.v)|round(1) if count_total.v > 0 else 0 %}
+
+<div class="card" style="text-align:center; padding:32px;">
+    <h3 style="font-size:14px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Média Geral da Auditoria</h3>
+    <div class="score-circle" style="width:80px; height:80px; font-size:28px; margin:0 auto;
+        {% if media_geral >= 7 %}background:var(--success);{% elif media_geral >= 4 %}background:var(--warning);{% else %}background:var(--danger);{% endif %}">
+        {{ media_geral }}
+    </div>
+    <p style="margin-top:8px; font-size:13px; color:var(--text-muted);">de 10 pontos possíveis</p>
+</div>
+
+<!-- ─── Detalhes por Senso ─────────────────────────────────────────── -->
+{% for senso, info in SENSES_INFO.items() %}
+<div class="senso-section">
+    <div class="senso-section-header" style="background: {{ info.color }};">
+        <span class="senso-header-icon">{{ info.icon }}</span>
+        <div>
+            <h3>{{ senso }} — Média: {{ medias_sensos.get(senso, 0) }}</h3>
+            <p>{{ info.desc }}</p>
+        </div>
+    </div>
+    <div class="senso-items">
+        {% set items = itens_por_senso.get(senso, []) %}
+        {% if items %}
+        {% for item in items %}
+        <div class="senso-item">
+            <span class="senso-item-text">{{ item.item }}</span>
+            <div class="senso-item-score">
+                <div class="score-bar" style="width:100px;">
+                    <div class="score-bar-fill" style="width:{{ item.nota * 10 }}%;
+                        {% if item.nota >= 7 %}background:var(--success);{% elif item.nota >= 4 %}background:var(--warning);{% else %}background:var(--danger);{% endif %}">
+                    </div>
+                </div>
+                <div class="score-display" style="
+                    {% if item.nota >= 7 %}color:var(--success); border-color:var(--success);{% elif item.nota >= 4 %}color:var(--warning); border-color:var(--warning);{% else %}color:var(--danger); border-color:var(--danger);{% endif %}">
+                    {{ item.nota }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="senso-item">
+            <span class="senso-item-text" style="color:var(--text-muted); font-style:italic;">Sem dados para este senso</span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+
+<div style="text-align:center; margin-bottom:40px;">
+    <button onclick="window.print()" class="btn btn-primary">🖨️ Imprimir Relatório</button>
+</div>
+{% endblock %}

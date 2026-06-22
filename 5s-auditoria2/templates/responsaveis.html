@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Responsáveis - Programa 5S{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" width="28" height="28" style="vertical-align:middle; margin-right:6px;"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><circle cx="17" cy="7" r="3"/><path d="M21 21v-2a3 3 0 00-3-3h-1"/></svg> Responsaveis</h1>
+        <p>Gerencie os responsáveis por setor</p>
+    </div>
+    <button onclick="document.getElementById('novoRespForm').style.display='block'" class="btn btn-primary">+ Novo Responsável</button>
+</div>
+
+<!-- ─── Formulário Novo Responsável ────────────────────────────────── -->
+<div class="card" id="novoRespForm" style="display:none; animation: fadeInUp .3s ease-out;">
+    <div class="card-header">
+        <h3>Novo Responsável</h3>
+        <button onclick="this.closest('.card').style.display='none'" class="btn btn-outline btn-sm">✕</button>
+    </div>
+    <form method="POST" action="{{ url_for('novo_responsavel') }}">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Nome <span class="required">*</span></label>
+                <input type="text" name="nome" class="form-control" placeholder="Nome completo" required>
+            </div>
+            <div class="form-group">
+                <label>E-mail</label>
+                <input type="email" name="email" class="form-control" placeholder="email@empresa.com">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Setor <span class="required">*</span></label>
+            <select name="setor_id" class="form-control" required>
+                <option value="">Selecione o setor...</option>
+                {% for setor in setores %}
+                <option value="{{ setor.id }}">{{ setor.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-success"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-right:4px;"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg> Salvar</button>
+    </form>
+</div>
+
+{% if setores|length == 0 %}
+<div class="card" style="text-align:center; padding:50px;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="1.5" width="52" height="52" style="margin-bottom:12px; opacity:.7;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <h3 style="color:var(--warning); font-weight:700;">Cadastre setores primeiro</h3>
+    <p style="color:var(--text-muted); font-size:14px; margin-top:10px;">É necessário ter ao menos um setor antes de cadastrar responsáveis.</p>
+    <a href="{{ url_for('listar_setores') }}" class="btn btn-primary" style="margin-top:16px;">Cadastrar Setores</a>
+</div>
+{% else %}
+
+<!-- ─── Lista de Responsáveis ──────────────────────────────────────── -->
+<div class="card">
+    {% if responsaveis %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>Setor</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resp in responsaveis %}
+                <tr>
+                    <td><strong>{{ resp.nome }}</strong></td>
+                    <td style="color:var(--text-muted);">{{ resp.email or '—' }}</td>
+                    <td><span class="badge badge-blue">{{ resp.setor_nome }}</span></td>
+                    <td>
+                        <form method="POST" action="{{ url_for('excluir_responsavel', id=resp.id) }}" style="display:inline;" onsubmit="return confirm('Excluir este responsável?')">
+                            <button type="submit" class="btn btn-danger btn-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:60px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.2" width="64" height="64" style="margin-bottom:16px; opacity:.4;"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><circle cx="17" cy="7" r="3"/><path d="M21 21v-2a3 3 0 00-3-3h-1"/></svg>
+        <h3 style="color:var(--text-muted); font-weight:700;">Nenhum responsável cadastrado</h3>
+        <p style="color:var(--text-muted); font-size:14px; margin-top:10px;">Clique em "Novo Responsável" para começar.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endif %}
+{% endblock %}

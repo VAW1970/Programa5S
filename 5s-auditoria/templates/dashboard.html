@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Programa 5S{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>📊 Dashboard</h1>
+        <p>Visão geral do Programa 5S da empresa</p>
+    </div>
+    <a href="{{ url_for('nova_auditoria') }}" class="btn btn-primary">📝 Nova Auditoria</a>
+</div>
+
+<!-- ─── Estatísticas Gerais ─────────────────────────────────────────── -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue">📋</div>
+        <div>
+            <div class="stat-value">{{ stats.total_auditorias or 0 }}</div>
+            <div class="stat-label">Auditorias</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">🏢</div>
+        <div>
+            <div class="stat-value">{{ stats.total_setores or 0 }}</div>
+            <div class="stat-label">Setores</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon orange">👥</div>
+        <div>
+            <div class="stat-value">{{ stats.total_responsaveis or 0 }}</div>
+            <div class="stat-label">Responsáveis</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon purple">⭐</div>
+        <div>
+            <div class="stat-value">{{ stats.media_geral or '—' }}</div>
+            <div class="stat-label">Média Geral</div>
+        </div>
+    </div>
+</div>
+
+<!-- ─── Média por Senso ─────────────────────────────────────────────── -->
+<h2 style="font-size:18px; font-weight:700; margin-bottom:16px;">Média por Senso</h2>
+<div class="sensos-grid">
+    {% for senso, info in SENSES_INFO.items() %}
+    <div class="senso-card" style="border-top: 4px solid {{ info.color }};">
+        <div class="senso-icon">{{ info.icon }}</div>
+        <div class="senso-name">{{ senso }}</div>
+        <div class="senso-desc">{{ info.desc }}</div>
+        <div class="senso-score" style="color: {{ info.color }};">
+            {% set media = namespace(v=0) %}
+            {% for ts in totais_sensos %}
+                {% if ts.senso == senso %}
+                    {% set media.v = ts.media %}
+                {% endif %}
+            {% endfor %}
+            {% if media.v %}{{ media.v }}{% else %}—{% endif %}
+        </div>
+        <div class="senso-label">pontuação média</div>
+        <div class="score-bar" style="margin-top:10px;">
+            <div class="score-bar-fill" style="width:{{ ((media.v|float * 10)|int) if media.v else 0 }}%; background:{{ info.color }};"></div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- ─── Totais por Setor ────────────────────────────────────────────── -->
+<h2 style="font-size:18px; font-weight:700; margin-bottom:16px;">Pontuação por Setor</h2>
+<div class="sectors-grid">
+    {% if setores %}
+        {% for setor in setores %}
+        <div class="sector-card">
+            <div class="sector-card-header">
+                <div>
+                    <h4>🏢 {{ setor.nome }}</h4>
+                    <p>{{ setor.descricao or 'Sem descrição' }}</p>
+                </div>
+                {% set pct = (setor.media_geral|float / 10 * 100) if setor.media_geral else 0 %}
+                {% if setor.media_geral %}
+                {% if pct >= 70 %}
+                <span class="badge badge-green">Bom</span>
+                {% elif pct >= 40 %}
+                <span class="badge badge-yellow">Regular</span>
+                {% else %}
+                <span class="badge badge-red">Atenção</span>
+                {% endif %}
+                {% else %}
+                <span class="badge badge-blue">Sem dados</span>
+                {% endif %}
+            </div>
+            <div class="sector-card-stats">
+                <div class="sector-stat">
+                    <div class="sector-stat-value" style="color:var(--accent);">{{ setor.media_geral or '—' }}</div>
+                    <div class="sector-stat-label">Média Geral</div>
+                </div>
+                <div class="sector-stat">
+                    <div class="sector-stat-value" style="color:var(--success);">{{ setor.soma_pontos or 0 }}</div>
+                    <div class="sector-stat-label">Total de Pontos</div>
+                </div>
+                <div class="sector-stat">
+                    <div class="sector-stat-value" style="color:var(--info);">{{ setor.total_auditorias }}</div>
+                    <div class="sector-stat-label">Auditorias</div>
+                </div>
+                <div class="sector-stat">
+                    <div class="sector-stat-value">{{ ((setor.media_geral|float * 10)|round|int) if setor.media_geral else 0 }}%</div>
+                    <div class="sector-stat-label">Aproveitamento</div>
+                </div>
+            </div>
+            <div class="score-bar" style="margin-top:14px;">
+                <div class="score-bar-fill" style="width:{{ ((setor.media_geral|float * 10)|int) if setor.media_geral else 0 }}%; background: var(--accent);"></div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="card" style="grid-column: 1/-1; text-align:center; padding:40px;">
+            <p style="font-size:48px; margin-bottom:12px;">🏢</p>
+            <h3 style="color:var(--text-muted);">Nenhum setor cadastrado</h3>
+            <p style="color:var(--text-muted); font-size:14px; margin-top:8px;">Cadastre setores e responsáveis para começar as auditorias.</p>
+            <a href="{{ url_for('listar_setores') }}" class="btn btn-primary" style="margin-top:16px;">Cadastrar Setores</a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- ─── Últimas Auditorias ──────────────────────────────────────────── -->
+<div class="card">
+    <div class="card-header">
+        <h3>📋 Últimas Auditorias</h3>
+        <a href="{{ url_for('listar_auditorias') }}" class="btn btn-outline btn-sm">Ver todas</a>
+    </div>
+    {% if ultimas %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Setor</th>
+                    <th>Responsável</th>
+                    <th>Auditor</th>
+                    <th>Média</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for aud in ultimas %}
+                <tr>
+                    <td>{{ aud.data_auditoria }}</td>
+                    <td><strong>{{ aud.setor_nome }}</strong></td>
+                    <td>{{ aud.responsavel_nome }}</td>
+                    <td>{{ aud.auditor }}</td>
+                    <td>
+                        {% if aud.media %}
+                        <span class="score-value" style="{% if aud.media >= 7 %}color:var(--success){% elif aud.media >= 4 %}color:var(--warning){% else %}color:var(--danger){% endif %}">
+                            {{ aud.media }}
+                        </span>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td><a href="{{ url_for('ver_auditoria', id=aud.id) }}" class="btn btn-outline btn-sm">Ver</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:30px;">
+        <p style="color:var(--text-muted); font-size:14px;">Nenhuma auditoria realizada ainda.</p>
+        <a href="{{ url_for('nova_auditoria') }}" class="btn btn-primary" style="margin-top:12px;">Iniciar Primeira Auditoria</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

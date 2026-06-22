@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Auditorias - Programa 5S{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>📋 Auditorias</h1>
+        <p>Todas as auditorias 5S realizadas</p>
+    </div>
+    <a href="{{ url_for('nova_auditoria') }}" class="btn btn-primary">📝 Nova Auditoria</a>
+</div>
+
+<div class="card">
+    {% if auditorias %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Data</th>
+                    <th>Setor</th>
+                    <th>Responsável</th>
+                    <th>Auditor</th>
+                    <th>Itens</th>
+                    <th>Média</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for aud in auditorias %}
+                <tr>
+                    <td>{{ aud.id }}</td>
+                    <td>{{ aud.data_auditoria }}</td>
+                    <td><strong>{{ aud.setor_nome }}</strong></td>
+                    <td>{{ aud.responsavel_nome }}</td>
+                    <td>{{ aud.auditor }}</td>
+                    <td>{{ aud.total_itens }}</td>
+                    <td>
+                        {% if aud.media %}
+                        <span class="score-value" style="{% if aud.media >= 7 %}color:var(--success){% elif aud.media >= 4 %}color:var(--warning){% else %}color:var(--danger){% endif %}">
+                            {{ aud.media }}
+                        </span>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px;">
+                            <a href="{{ url_for('ver_auditoria', id=aud.id) }}" class="btn btn-outline btn-sm">Ver</a>
+                            <form method="POST" action="{{ url_for('excluir_auditoria', id=aud.id) }}" style="display:inline;" onsubmit="return confirm('Excluir esta auditoria?')">
+                                <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:50px;">
+        <p style="font-size:48px; margin-bottom:12px;">📋</p>
+        <h3 style="color:var(--text-muted);">Nenhuma auditoria encontrada</h3>
+        <p style="color:var(--text-muted); font-size:14px; margin-top:8px;">Clique em "Nova Auditoria" para começar.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

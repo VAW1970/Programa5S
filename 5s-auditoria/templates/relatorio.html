@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Relatórios - Programa 5S{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>📄 Relatórios</h1>
+        <p>Relatórios de auditorias 5S com filtros</p>
+    </div>
+    <button onclick="window.print()" class="btn btn-primary">🖨️ Imprimir</button>
+</div>
+
+<!-- ─── Filtros ────────────────────────────────────────────────────── -->
+<div class="filter-bar">
+    <form method="GET" action="{{ url_for('relatorio') }}" style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; width:100%;">
+        <div class="form-group">
+            <label>Setor</label>
+            <select name="setor_id" class="form-control">
+                <option value="">Todos os setores</option>
+                {% for setor in setores %}
+                <option value="{{ setor.id }}" {% if setor_id_filtro == setor.id %}selected{% endif %}>{{ setor.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Data Início</label>
+            <input type="date" name="data_inicio" class="form-control" value="{{ data_inicio }}">
+        </div>
+        <div class="form-group">
+            <label>Data Fim</label>
+            <input type="date" name="data_fim" class="form-control" value="{{ data_fim }}">
+        </div>
+        <button type="submit" class="btn btn-primary">🔍 Filtrar</button>
+        <a href="{{ url_for('relatorio') }}" class="btn btn-outline">Limpar</a>
+    </form>
+</div>
+
+<!-- ─── Resumo por Setor ───────────────────────────────────────────── -->
+{% if resumo_setores %}
+<div class="report-section">
+    <h3 class="report-title">📊 Resumo por Setor</h3>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Setor</th>
+                    <th>Auditorias</th>
+                    <th>Pontos Totais</th>
+                    <th>Média Geral</th>
+                    <th>Classificação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rs in resumo_setores %}
+                <tr>
+                    <td><strong>{{ rs.nome }}</strong></td>
+                    <td>{{ rs.total_auditorias }}</td>
+                    <td>{{ rs.soma_pontos or 0 }}</td>
+                    <td>
+                        <strong style="{% if rs.media_geral >= 7 %}color:var(--success){% elif rs.media_geral >= 4 %}color:var(--warning){% else %}color:var(--danger){% endif %}">
+                            {{ rs.media_geral or '—' }}
+                        </strong>
+                    </td>
+                    <td>
+                        {% if rs.media_geral %}
+                        {% if rs.media_geral >= 7 %}
+                            <span class="badge badge-green">Excelente</span>
+                        {% elif rs.media_geral >= 5 %}
+                            <span class="badge badge-yellow">Bom</span>
+                        {% elif rs.media_geral >= 3 %}
+                            <span class="badge badge-red">Regular</span>
+                        {% else %}
+                            <span class="badge badge-red">Crítico</span>
+                        {% endif %}
+                        {% else %}
+                            <span class="badge badge-blue">Sem dados</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<!-- ─── Detalhes das Auditorias ────────────────────────────────────── -->
+{% if dados_auditorias %}
+<h2 style="font-size:18px; font-weight:700; margin-bottom:16px;">Detalhes das Auditorias</h2>
+
+{% for dado in dados_auditorias %}
+{% set aud = dado.auditoria %}
+<div class="report-section" style="page-break-inside:avoid;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <div>
+            <h3 style="font-size:16px;">Auditoria #{{ aud.id }} — {{ aud.setor_nome }}</h3>
+            <p style="font-size:13px; color:var(--text-muted); margin-top:2px;">
+                📅 {{ aud.data_auditoria }} &nbsp;|&nbsp; 👤 {{ aud.responsavel_nome }} &nbsp;|&nbsp; 🔍 {{ aud.auditor }}
+            </p>
+        </div>
+        <div style="text-align:center;">
+            <div class="score-circle" style="{% if dado.media_geral >= 7 %}background:var(--success);{% elif dado.media_geral >= 4 %}background:var(--warning);{% else %}background:var(--danger);{% endif %}">
+                {{ dado.media_geral }}
+            </div>
+            <p style="font-size:11px; color:var(--text-muted); margin-top:4px;">Média</p>
+        </div>
+    </div>
+
+    <!-- Médias por senso -->
+    <div class="sensos-grid" style="grid-template-columns:repeat(5, 1fr); margin-bottom:16px;">
+        {% for senso, info in SENSES_INFO.items() %}
+        <div style="text-align:center; padding:12px; background:#f8f9fc; border-radius:8px; border-top:3px solid {{ info.color }};">
+            <div style="font-size:20px;">{{ info.icon }}</div>
+            <div style="font-size:11px; font-weight:600; margin-top:4px;">{{ senso.split(' ')[0] }}</div>
+            <div style="font-size:20px; font-weight:700; color:{{ info.color }}; margin-top:4px;">{{ dado.medias_sensos.get(senso, 0) }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if aud.observacoes %}
+    <div style="padding:10px 14px; background:#f8f9fc; border-radius:8px; font-size:13px; color:var(--text-muted);">
+        <strong>Obs:</strong> {{ aud.observacoes }}
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+
+{% else %}
+<div class="card" style="text-align:center; padding:50px;">
+    <p style="font-size:48px; margin-bottom:12px;">📄</p>
+    <h3 style="color:var(--text-muted);">Nenhum dado encontrado</h3>
+    <p style="color:var(--text-muted); font-size:14px; margin-top:8px;">Ajuste os filtros ou realize novas auditorias.</p>
+</div>
+{% endif %}
+{% endblock %}

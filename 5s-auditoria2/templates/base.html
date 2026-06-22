@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Programa 5S{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M8 12h8"/>
+                    <path d="M12 8v8"/>
+                    <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none" opacity="0.3"/>
+                </svg>
+            </div>
+            <div>
+                <h2>Programa 5S</h2>
+                <span class="version">v2.0 Modern</span>
+            </div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
+                <span class="nav-icon-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+                </span> Dashboard
+            </a></li>
+            <li><a href="{{ url_for('listar_setores') }}" class="{% if request.endpoint in ['listar_setores'] %}active{% endif %}">
+                <span class="nav-icon-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M3 21V7l9-4 9 4v14"/><path d="M9 21V11h6v10"/><path d="M3 11h18"/></svg>
+                </span> Setores
+            </a></li>
+            <li><a href="{{ url_for('listar_responsaveis') }}" class="{% if request.endpoint == 'listar_responsaveis' %}active{% endif %}">
+                <span class="nav-icon-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><circle cx="17" cy="7" r="3"/><path d="M21 21v-2a3 3 0 00-3-3h-1"/></svg>
+                </span> Responsaveis
+            </a></li>
+            <li><a href="{{ url_for('nova_auditoria') }}" class="{% if request.endpoint == 'nova_auditoria' %}active{% endif %}">
+                <span class="nav-icon-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M14 3v4a1 1 0 001 1h4"/><path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/><path d="M12 11v6"/><path d="M9 14h6"/></svg>
+                </span> Nova Auditoria
+            </a></li>
+            <li><a href="{{ url_for('listar_auditorias') }}" class="{% if request.endpoint == 'listar_auditorias' %}active{% endif %}">
+                <span class="nav-icon-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>
+                </span> Auditorias
+            </a></li>
+            <li><a href="{{ url_for('relatorio') }}" class="{% if request.endpoint == 'relatorio' %}active{% endif %}">
+                <span class="nav-icon-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M14 3v4a1 1 0 001 1h4"/><path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/><path d="M9 9h6"/><path d="M9 13h4"/></svg>
+                </span> Relatorios
+            </a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <p>Programa 5S v2.0</p>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">
+                            <span>{{ message }}</span>
+                            <button class="flash-close" onclick="this.parentElement.remove()">&times;</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+        setTimeout(() => {
+            document.querySelectorAll('.flash').forEach(f => {
+                f.style.opacity = '0';
+                f.style.transform = 'translateY(-10px)';
+                setTimeout(() => f.remove(), 300);
+            });
+        }, 5000);
+
+        function carregarResponsaveis(setorId, selectEl) {
+            if (!setorId) {
+                selectEl.innerHTML = '<option value="">Selecione o setor primeiro</option>';
+                return;
+            }
+            fetch(`/api/responsaveis_por_setor/${setorId}`)
+                .then(r => r.json())
+                .then(data => {
+                    selectEl.innerHTML = '<option value="">Selecione...</option>';
+                    data.forEach(r => {
+                        const opt = document.createElement('option');
+                        opt.value = r.id;
+                        opt.textContent = r.nome;
+                        selectEl.appendChild(opt);
+                    });
+                });
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

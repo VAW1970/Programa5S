@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Programa 5S{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-icon">5S</div>
+            <h2>Programa 5S</h2>
+        </div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
+                <span class="nav-icon">📊</span> Dashboard
+            </a></li>
+            <li><a href="{{ url_for('listar_setores') }}" class="{% if request.endpoint in ['listar_setores'] %}active{% endif %}">
+                <span class="nav-icon">🏢</span> Setores
+            </a></li>
+            <li><a href="{{ url_for('listar_responsaveis') }}" class="{% if request.endpoint == 'listar_responsaveis' %}active{% endif %}">
+                <span class="nav-icon">👥</span> Responsáveis
+            </a></li>
+            <li><a href="{{ url_for('nova_auditoria') }}" class="{% if request.endpoint == 'nova_auditoria' %}active{% endif %}">
+                <span class="nav-icon">📝</span> Nova Auditoria
+            </a></li>
+            <li><a href="{{ url_for('listar_auditorias') }}" class="{% if request.endpoint == 'listar_auditorias' %}active{% endif %}">
+                <span class="nav-icon">📋</span> Auditorias
+            </a></li>
+            <li><a href="{{ url_for('relatorio') }}" class="{% if request.endpoint == 'relatorio' %}active{% endif %}">
+                <span class="nav-icon">📄</span> Relatórios
+            </a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <p>Programa 5S v1.0</p>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">
+                            {{ message }}
+                            <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+        // Auto-dismiss flash messages
+        setTimeout(() => {
+            document.querySelectorAll('.flash').forEach(f => {
+                f.style.opacity = '0';
+                setTimeout(() => f.remove(), 300);
+            });
+        }, 5000);
+
+        // Helper: fetch responsaveis by setor
+        function carregarResponsaveis(setorId, selectEl) {
+            if (!setorId) {
+                selectEl.innerHTML = '<option value="">Selecione o setor primeiro</option>';
+                return;
+            }
+            fetch(`/api/responsaveis_por_setor/${setorId}`)
+                .then(r => r.json())
+                .then(data => {
+                    selectEl.innerHTML = '<option value="">Selecione...</option>';
+                    data.forEach(r => {
+                        const opt = document.createElement('option');
+                        opt.value = r.id;
+                        opt.textContent = r.nome;
+                        selectEl.appendChild(opt);
+                    });
+                });
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

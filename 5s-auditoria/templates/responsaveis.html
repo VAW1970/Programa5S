@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Responsáveis - Programa 5S{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>👥 Responsáveis</h1>
+        <p>Gerencie os responsáveis por setor</p>
+    </div>
+    <button onclick="document.getElementById('novoRespForm').style.display='block'" class="btn btn-primary">+ Novo Responsável</button>
+</div>
+
+<!-- ─── Formulário Novo Responsável ────────────────────────────────── -->
+<div class="card" id="novoRespForm" style="display:none;">
+    <div class="card-header">
+        <h3>Novo Responsável</h3>
+        <button onclick="this.closest('.card').style.display='none'" class="btn btn-outline btn-sm">✕</button>
+    </div>
+    <form method="POST" action="{{ url_for('novo_responsavel') }}">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Nome <span class="required">*</span></label>
+                <input type="text" name="nome" class="form-control" placeholder="Nome completo" required>
+            </div>
+            <div class="form-group">
+                <label>E-mail</label>
+                <input type="email" name="email" class="form-control" placeholder="email@empresa.com">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Setor <span class="required">*</span></label>
+            <select name="setor_id" class="form-control" required>
+                <option value="">Selecione o setor...</option>
+                {% for setor in setores %}
+                <option value="{{ setor.id }}">{{ setor.nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-success">✅ Salvar</button>
+    </form>
+</div>
+
+{% if setores|length == 0 %}
+<div class="card" style="text-align:center; padding:40px;">
+    <p style="font-size:36px; margin-bottom:8px;">⚠️</p>
+    <h3 style="color:var(--warning);">Cadastre setores primeiro</h3>
+    <p style="color:var(--text-muted); font-size:14px; margin-top:8px;">É necessário ter ao menos um setor antes de cadastrar responsáveis.</p>
+    <a href="{{ url_for('listar_setores') }}" class="btn btn-primary" style="margin-top:12px;">Cadastrar Setores</a>
+</div>
+{% else %}
+
+<!-- ─── Lista de Responsáveis ──────────────────────────────────────── -->
+<div class="card">
+    {% if responsaveis %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>Setor</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resp in responsaveis %}
+                <tr>
+                    <td><strong>{{ resp.nome }}</strong></td>
+                    <td style="color:var(--text-muted);">{{ resp.email or '—' }}</td>
+                    <td><span class="badge badge-blue">{{ resp.setor_nome }}</span></td>
+                    <td>
+                        <form method="POST" action="{{ url_for('excluir_responsavel', id=resp.id) }}" style="display:inline;" onsubmit="return confirm('Excluir este responsável?')">
+                            <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:50px;">
+        <p style="font-size:48px; margin-bottom:12px;">👥</p>
+        <h3 style="color:var(--text-muted);">Nenhum responsável cadastrado</h3>
+        <p style="color:var(--text-muted); font-size:14px; margin-top:8px;">Clique em "Novo Responsável" para começar.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endif %}
+{% endblock %}

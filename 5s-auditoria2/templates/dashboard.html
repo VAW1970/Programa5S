@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Programa 5S{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="28" height="28" style="vertical-align:middle; margin-right:6px; color:var(--accent);"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> Dashboard</h1>
+        <p>Visao geral do Programa 5S da empresa</p>
+    </div>
+    <a href="{{ url_for('nova_auditoria') }}" class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-right:4px;"><path d="M12 5v14M5 12h14"/></svg> Nova Auditoria</a>
+</div>
+
+<!-- ─── Estatísticas Gerais ─────────────────────────────────────────── -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="24" height="24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg></div>
+        <div>
+            <div class="stat-value">{{ stats.total_auditorias or 0 }}</div>
+            <div class="stat-label">Auditorias</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="24" height="24"><path d="M3 21V7l9-4 9 4v14"/><path d="M9 21V11h6v10"/></svg></div>
+        <div>
+            <div class="stat-value">{{ stats.total_setores or 0 }}</div>
+            <div class="stat-label">Setores</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="24" height="24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><circle cx="17" cy="7" r="3"/><path d="M21 21v-2a3 3 0 00-3-3h-1"/></svg></div>
+        <div>
+            <div class="stat-value">{{ stats.total_responsaveis or 0 }}</div>
+            <div class="stat-label">Responsaveis</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="24" height="24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+        <div>
+            <div class="stat-value">{{ stats.media_geral or '—' }}</div>
+            <div class="stat-label">Media Geral</div>
+        </div>
+    </div>
+</div>
+
+<!-- ─── Média por Senso ─────────────────────────────────────────────── -->
+<h2 style="font-size:20px; font-weight:800; margin-bottom:18px; letter-spacing:-0.5px;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" width="22" height="22" style="vertical-align:middle; margin-right:4px;"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Media por Senso</h2>
+<div class="sensos-grid">
+    {% for senso, info in SENSES_INFO.items() %}
+    <div class="senso-card" style="border-top: 4px solid {{ info.color }};">
+        <span class="senso-icon">{{ info.icon|safe }}</span>
+        <div class="senso-name">{{ senso }}</div>
+        <div class="senso-desc">{{ info.desc }}</div>
+        <div class="senso-score" style="color: {{ info.color }};">
+            {% set media = namespace(v=0) %}
+            {% for ts in totais_sensos %}
+                {% if ts.senso == senso %}
+                    {% set media.v = ts.media %}
+                {% endif %}
+            {% endfor %}
+            {% if media.v %}{{ media.v }}{% else %}—{% endif %}
+        </div>
+        <div class="senso-label">pontuação média</div>
+        <div class="score-bar">
+            <div class="score-bar-fill" style="width:{{ ((media.v|float * 10)|int) if media.v else 0 }}%; background:{{ info.color }};"></div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- ─── Totais por Setor ────────────────────────────────────────────── -->
+<h2 style="font-size:20px; font-weight:800; margin-bottom:18px; letter-spacing:-0.5px;"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" width="22" height="22" style="vertical-align:middle; margin-right:4px;"><path d="M3 21V7l9-4 9 4v14"/><path d="M9 21V11h6v10"/></svg> Pontuacao por Setor</h2>
+<div class="sectors-grid">
+    {% if setores %}
+        {% for setor in setores %}
+        <div class="sector-card">
+            <div class="sector-card-header">
+                <div>
+                    <h4><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" width="18" height="18" style="vertical-align:middle; margin-right:4px;"><path d="M3 21V7l9-4 9 4v14"/><path d="M9 21V11h6v10"/></svg> {{ setor.nome }}</h4>
+                    <p>{{ setor.descricao or 'Sem descrição' }}</p>
+                </div>
+                {% if setor.media_geral %}
+                {% set pct = (setor.media_geral|float * 10)|int %}
+                {% if pct >= 70 %}
+                <span class="badge badge-green">Bom</span>
+                {% elif pct >= 40 %}
+                <span class="badge badge-yellow">Regular</span>
+                {% else %}
+                <span class="badge badge-red">Atenção</span>
+                {% endif %}
+                {% else %}
+                <span class="badge badge-blue">Sem dados</span>
+                {% endif %}
+            </div>
+            <div class="sector-card-stats">
+                <div class="sector-stat">
+                    <div class="sector-stat-value" style="color:var(--accent);">{{ setor.media_geral or '—' }}</div>
+                    <div class="sector-stat-label">Média Geral</div>
+                </div>
+                <div class="sector-stat">
+                    <div class="sector-stat-value" style="color:var(--success);">{{ setor.soma_pontos or 0 }}</div>
+                    <div class="sector-stat-label">Total de Pontos</div>
+                </div>
+                <div class="sector-stat">
+                    <div class="sector-stat-value" style="color:var(--info);">{{ setor.total_auditorias }}</div>
+                    <div class="sector-stat-label">Auditorias</div>
+                </div>
+                <div class="sector-stat">
+                    <div class="sector-stat-value">{{ ((setor.media_geral|float * 10)|round|int) if setor.media_geral else 0 }}%</div>
+                    <div class="sector-stat-label">Aproveitamento</div>
+                </div>
+            </div>
+            <div class="score-bar" style="margin-top:16px;">
+                <div class="score-bar-fill" style="width:{{ ((setor.media_geral|float * 10)|int) if setor.media_geral else 0 }}%; background: linear-gradient(90deg, var(--accent), var(--purple));"></div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="card" style="grid-column: 1/-1; text-align:center; padding:50px;">
+            <p style="font-size:52px; margin-bottom:14px;">🏢</p>
+            <h3 style="color:var(--text-muted); font-weight:700;">Nenhum setor cadastrado</h3>                    <p style="color:var(--text-muted); font-size:14px; margin-top:10px;">Cadastre setores e responsaveis para comecar as auditorias.</p>
+            <a href="{{ url_for('listar_setores') }}" class="btn btn-primary" style="margin-top:20px;">Cadastrar Setores</a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- ─── Últimas Auditorias ──────────────────────────────────────────── -->
+<div class="card">
+    <div class="card-header">
+        <h3><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" width="18" height="18" style="vertical-align:middle; margin-right:4px;"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg> Ultimas Auditorias</h3>
+        <a href="{{ url_for('listar_auditorias') }}" class="btn btn-outline btn-sm">Ver todas →</a>
+    </div>
+    {% if ultimas %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Setor</th>
+                    <th>Responsável</th>
+                    <th>Auditor</th>
+                    <th>Média</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for aud in ultimas %}
+                <tr>
+                    <td>{{ aud.data_auditoria }}</td>
+                    <td><strong>{{ aud.setor_nome }}</strong></td>
+                    <td>{{ aud.responsavel_nome }}</td>
+                    <td>{{ aud.auditor }}</td>
+                    <td>
+                        {% if aud.media %}
+                        <span class="score-value" style="{% if aud.media >= 7 %}color:var(--success){% elif aud.media >= 4 %}color:var(--warning){% else %}color:var(--danger){% endif %}">
+                            {{ aud.media }}
+                        </span>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td><a href="{{ url_for('ver_auditoria', id=aud.id) }}" class="btn btn-outline btn-sm">Ver →</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:40px;">
+        <p style="color:var(--text-muted); font-size:15px;">Nenhuma auditoria realizada ainda.</p>
+        <a href="{{ url_for('nova_auditoria') }}" class="btn btn-primary" style="margin-top:16px;">Iniciar Primeira Auditoria</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

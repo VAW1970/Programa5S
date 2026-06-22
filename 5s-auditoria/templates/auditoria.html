@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Nova Auditoria 5S{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>📝 Nova Auditoria 5S</h1>
+        <p>Avalie cada item dos 5 sensos de 0 a 10</p>
+    </div>
+    <a href="{{ url_for('listar_auditorias') }}" class="btn btn-outline">← Voltar</a>
+</div>
+
+<form method="POST" action="{{ url_for('salvar_auditoria') }}">
+    <!-- ─── Dados Gerais ─────────────────────────────────────────────── -->
+    <div class="card">
+        <div class="card-header">
+            <h3>Informações da Auditoria</h3>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Setor <span class="required">*</span></label>
+                <select name="setor_id" id="setorSelect" class="form-control" required onchange="carregarResponsaveis(this.value, document.getElementById('responsavelSelect'))">
+                    <option value="">Selecione o setor...</option>
+                    {% for setor in setores %}
+                    <option value="{{ setor.id }}">{{ setor.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Responsável <span class="required">*</span></label>
+                <select name="responsavel_id" id="responsavelSelect" class="form-control" required>
+                    <option value="">Selecione o setor primeiro...</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Auditor <span class="required">*</span></label>
+                <input type="text" name="auditor" class="form-control" placeholder="Nome do auditor" required>
+            </div>
+            <div class="form-group">
+                <label>Data da Auditoria <span class="required">*</span></label>
+                <input type="date" name="data_auditoria" class="form-control" value="{{ now.strftime('%Y-%m-%d') }}" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Observações</label>
+            <textarea name="observacoes" class="form-control" placeholder="Observações gerais sobre a auditoria..." rows="3"></textarea>
+        </div>
+    </div>
+
+    <!-- ─── Itens dos 5S ─────────────────────────────────────────────── -->
+    {% for senso, info in SENSES_INFO.items() %}
+    <div class="senso-section">
+        <div class="senso-section-header" style="background: {{ info.color }};">
+            <span class="senso-header-icon">{{ info.icon }}</span>
+            <div>
+                <h3>{{ senso }}</h3>
+                <p>{{ info.desc }}</p>
+            </div>
+        </div>
+        <div class="senso-items">
+            {% set items = SENSOS_ITEMS[senso] %}
+            {% for item in items %}
+            <div class="senso-item">
+                <span class="senso-item-text">{{ item }}</span>
+                <div class="senso-item-score">
+                    <input type="range" min="0" max="10" value="5"
+                           class="score-slider"
+                           id="slider_{{ senso }}_{{ loop.index0 }}"
+                           name="nota_{{ senso }}_{{ loop.index0 }}"
+                           oninput="atualizarNota(this, 'display_{{ senso }}_{{ loop.index0 }}')">
+                    <div class="score-display" id="display_{{ senso }}_{{ loop.index0 }}">5</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- ─── Botões ───────────────────────────────────────────────────── -->
+    <div style="display:flex; gap:12px; justify-content:flex-end; margin-top:12px; margin-bottom:40px;">
+        <a href="{{ url_for('listar_auditorias') }}" class="btn btn-outline">Cancelar</a>
+        <button type="submit" class="btn btn-success">✅ Salvar Auditoria</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function atualizarNota(slider, displayId) {
+    const display = document.getElementById(displayId);
+    const val = parseInt(slider.value);
+    display.textContent = val;
+
+    if (val >= 7) {
+        display.style.color = 'var(--success)';
+        display.style.borderColor = 'var(--success)';
+    } else if (val >= 4) {
+        display.style.color = 'var(--warning)';
+        display.style.borderColor = 'var(--warning)';
+    } else {
+        display.style.color = 'var(--danger)';
+        display.style.borderColor = 'var(--danger)';
+    }
+}
+
+// Inicializar todos os displays
+document.querySelectorAll('.score-slider').forEach(slider => {
+    const displayId = slider.id.replace('slider_', 'display_');
+    atualizarNota(slider, displayId);
+});
+</script>
+{% endblock %}

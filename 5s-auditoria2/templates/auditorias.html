@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Auditorias - Programa 5S{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" width="28" height="28" style="vertical-align:middle; margin-right:6px;"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg> Auditorias</h1>
+        <p>Todas as auditorias 5S realizadas</p>
+    </div>
+    <a href="{{ url_for('nova_auditoria') }}" class="btn btn-primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-right:4px;"><path d="M12 5v14M5 12h14"/></svg> Nova Auditoria</a>
+</div>
+
+<div class="card">
+    {% if auditorias %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Data</th>
+                    <th>Setor</th>
+                    <th>Responsável</th>
+                    <th>Auditor</th>
+                    <th>Itens</th>
+                    <th>Média</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for aud in auditorias %}
+                <tr>
+                    <td><strong>{{ aud.id }}</strong></td>
+                    <td>{{ aud.data_auditoria }}</td>
+                    <td><strong>{{ aud.setor_nome }}</strong></td>
+                    <td>{{ aud.responsavel_nome }}</td>
+                    <td>{{ aud.auditor }}</td>
+                    <td>{{ aud.total_itens }}</td>
+                    <td>
+                        {% if aud.media %}
+                        <span class="score-value" style="{% if aud.media >= 7 %}color:var(--success){% elif aud.media >= 4 %}color:var(--warning){% else %}color:var(--danger){% endif %}">
+                            {{ aud.media }}
+                        </span>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>
+                        <div style="display:flex; gap:6px;">
+                            <a href="{{ url_for('ver_auditoria', id=aud.id) }}" class="btn btn-outline btn-sm">Ver →</a>
+                            <form method="POST" action="{{ url_for('excluir_auditoria', id=aud.id) }}" style="display:inline;" onsubmit="return confirm('Excluir esta auditoria?')">
+                                <button type="submit" class="btn btn-danger btn-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:60px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.2" width="64" height="64" style="margin-bottom:16px; opacity:.4;"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+        <h3 style="color:var(--text-muted); font-weight:700;">Nenhuma auditoria encontrada</h3>
+        <p style="color:var(--text-muted); font-size:14px; margin-top:10px;">Clique em "Nova Auditoria" para começar.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Setores - Programa 5S{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" width="28" height="28" style="vertical-align:middle; margin-right:6px;"><path d="M3 21V7l9-4 9 4v14"/><path d="M9 21V11h6v10"/></svg> Setores</h1>
+        <p>Gerencie os setores da empresa</p>
+    </div>
+    <button onclick="document.getElementById('novoSetorForm').style.display='block'" class="btn btn-primary">+ Novo Setor</button>
+</div>
+
+<!-- ─── Formulário Novo Setor ──────────────────────────────────────── -->
+<div class="card" id="novoSetorForm" style="display:none; animation: fadeInUp .3s ease-out;">
+    <div class="card-header">
+        <h3>Novo Setor</h3>
+        <button onclick="this.closest('.card').style.display='none'" class="btn btn-outline btn-sm">✕</button>
+    </div>
+    <form method="POST" action="{{ url_for('novo_setor') }}">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Nome <span class="required">*</span></label>
+                <input type="text" name="nome" class="form-control" placeholder="Ex: Produção" required>
+            </div>
+            <div class="form-group">
+                <label>Descrição</label>
+                <input type="text" name="descricao" class="form-control" placeholder="Descrição do setor">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" style="margin-right:4px;"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg> Salvar</button>
+    </form>
+</div>
+
+<!-- ─── Lista de Setores ───────────────────────────────────────────── -->
+<div class="card">
+    {% if setores %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Descrição</th>
+                    <th>Responsáveis</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for setor in setores %}
+                <tr>
+                    <td><strong>{{ setor.nome }}</strong></td>
+                    <td style="color:var(--text-muted);">{{ setor.descricao or '—' }}</td>
+                    <td><span class="badge badge-blue">{{ setor.total_responsaveis }}</span></td>
+                    <td>
+                        <div style="display:flex; gap:6px;">
+                            <a href="{{ url_for('listar_responsaveis') }}" class="btn btn-outline btn-sm">👥</a>
+                            <form method="POST" action="{{ url_for('excluir_setor', id=setor.id) }}" style="display:inline;" onsubmit="return confirm('Excluir este setor? Os responsáveis vinculados também serão excluídos.')">
+                                <button type="submit" class="btn btn-danger btn-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:60px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.2" width="64" height="64" style="margin-bottom:16px; opacity:.4;"><path d="M3 21V7l9-4 9 4v14"/><path d="M9 21V11h6v10"/></svg>
+        <h3 style="color:var(--text-muted); font-weight:700;">Nenhum setor cadastrado</h3>
+        <p style="color:var(--text-muted); font-size:14px; margin-top:10px;">Clique em "Novo Setor" para começar.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

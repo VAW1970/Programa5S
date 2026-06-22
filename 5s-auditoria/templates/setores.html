@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Setores - Programa 5S{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>🏢 Setores</h1>
+        <p>Gerencie os setores da empresa</p>
+    </div>
+    <button onclick="document.getElementById('novoSetorForm').style.display='block'" class="btn btn-primary">+ Novo Setor</button>
+</div>
+
+<!-- ─── Formulário Novo Setor ──────────────────────────────────────── -->
+<div class="card" id="novoSetorForm" style="display:none;">
+    <div class="card-header">
+        <h3>Novo Setor</h3>
+        <button onclick="this.closest('.card').style.display='none'" class="btn btn-outline btn-sm">✕</button>
+    </div>
+    <form method="POST" action="{{ url_for('novo_setor') }}">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Nome <span class="required">*</span></label>
+                <input type="text" name="nome" class="form-control" placeholder="Ex: Produção" required>
+            </div>
+            <div class="form-group">
+                <label>Descrição</label>
+                <input type="text" name="descricao" class="form-control" placeholder="Descrição do setor">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success">✅ Salvar</button>
+    </form>
+</div>
+
+<!-- ─── Lista de Setores ───────────────────────────────────────────── -->
+<div class="card">
+    {% if setores %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Descrição</th>
+                    <th>Responsáveis</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for setor in setores %}
+                <tr>
+                    <td><strong>{{ setor.nome }}</strong></td>
+                    <td style="color:var(--text-muted);">{{ setor.descricao or '—' }}</td>
+                    <td><span class="badge badge-blue">{{ setor.total_responsaveis }}</span></td>
+                    <td>
+                        <div style="display:flex; gap:6px;">
+                            <a href="{{ url_for('listar_responsaveis') }}" class="btn btn-outline btn-sm">👥</a>
+                            <form method="POST" action="{{ url_for('excluir_setor', id=setor.id) }}" style="display:inline;" onsubmit="return confirm('Excluir este setor? Os responsáveis vinculados também serão excluídos.')">
+                                <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:50px;">
+        <p style="font-size:48px; margin-bottom:12px;">🏢</p>
+        <h3 style="color:var(--text-muted);">Nenhum setor cadastrado</h3>
+        <p style="color:var(--text-muted); font-size:14px; margin-top:8px;">Clique em "Novo Setor" para começar.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
