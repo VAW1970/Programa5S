@@ -7,7 +7,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <nav class="sidebar">
+    <!-- Mobile Hamburger Toggle -->
+    <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+            <path d="M3 6h18M3 12h18M3 18h18"/>
+        </svg>
+    </button>
+
+    <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="logo-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
@@ -36,7 +43,7 @@
             <li><a href="{{ url_for('listar_responsaveis') }}" class="{% if request.endpoint == 'listar_responsaveis' %}active{% endif %}">
                 <span class="nav-icon-wrap">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><circle cx="17" cy="7" r="3"/><path d="M21 21v-2a3 3 0 00-3-3h-1"/></svg>
-                </span> Responsaveis
+                </span> Responsáveis
             </a></li>
             <li><a href="{{ url_for('nova_auditoria') }}" class="{% if request.endpoint == 'nova_auditoria' %}active{% endif %}">
                 <span class="nav-icon-wrap">
@@ -51,7 +58,7 @@
             <li><a href="{{ url_for('relatorio') }}" class="{% if request.endpoint == 'relatorio' %}active{% endif %}">
                 <span class="nav-icon-wrap">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20"><path d="M14 3v4a1 1 0 001 1h4"/><path d="M17 21H7a2 2 0 01-2-2V5a2 2 0 012-2h7l5 5v11a2 2 0 01-2 2z"/><path d="M9 9h6"/><path d="M9 13h4"/></svg>
-                </span> Relatorios
+                </span> Relatórios
             </a></li>
         </ul>
         <div class="sidebar-footer">
@@ -77,6 +84,25 @@
     </main>
 
     <script>
+        // Mobile sidebar toggle
+        const toggle = document.getElementById('mobileToggle');
+        const sidebar = document.getElementById('sidebar');
+        if (toggle && sidebar) {
+            toggle.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                toggle.classList.toggle('open');
+            });
+            // Close sidebar when clicking a nav link on mobile
+            sidebar.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('open');
+                        toggle.classList.remove('open');
+                    }
+                });
+            });
+        }
+
         setTimeout(() => {
             document.querySelectorAll('.flash').forEach(f => {
                 f.style.opacity = '0';

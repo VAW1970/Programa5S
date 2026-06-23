@@ -90,29 +90,29 @@ SENSOS_ITEMS = {
 
 SENSES_INFO = {
     "Seiri (Utilização)": {
-        "icon": '<svg viewBox="0 0 40 40" width="32" height="32"><circle cx="20" cy="14" r="7" fill="rgba(255,255,255,.25)" stroke="rgba(255,255,255,.6)" stroke-width="1.5"/><path d="M12 32c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5"/><path d="M26 12l4-4m-2 2l4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><circle cx="32" cy="10" r="4" fill="rgba(255,255,255,.15)"/></svg>',
+        "icon": '<svg viewBox="0 0 40 40" width="32" height="32"><circle cx="20" cy="14" r="7" fill="currentColor" fill-opacity=".15" stroke="currentColor" stroke-opacity=".5" stroke-width="1.5"/><path d="M12 32c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="none" stroke="currentColor" stroke-opacity=".5" stroke-width="1.5"/><path d="M26 12l4-4m-2 2l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="32" cy="10" r="4" fill="currentColor" opacity=".1"/></svg>',
         "color": "#e74c3c",
-        "desc": "Separar o necessario do desnecessario"
+        "desc": "Separar o necessário do desnecessário"
     },
     "Seiton (Organização)": {
-        "icon": '<svg viewBox="0 0 40 40" width="32" height="32"><circle cx="20" cy="14" r="7" fill="rgba(255,255,255,.25)" stroke="rgba(255,255,255,.6)" stroke-width="1.5"/><path d="M12 32c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5"/><rect x="15" y="6" width="10" height="3" rx="1.5" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M17 7.5h6" stroke="#fff" stroke-width="1" stroke-linecap="round"/></svg>',
+        "icon": '<svg viewBox="0 0 40 40" width="32" height="32"><circle cx="20" cy="14" r="7" fill="currentColor" fill-opacity=".15" stroke="currentColor" stroke-opacity=".5" stroke-width="1.5"/><path d="M12 32c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="none" stroke="currentColor" stroke-opacity=".5" stroke-width="1.5"/><rect x="15" y="6" width="10" height="3" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M17 7.5h6" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>',
         "color": "#f39c12",
         "desc": "Organizar e ter tudo no lugar"
     },
     "Seiso (Limpeza)": {
-        "icon": '<svg viewBox="0 0 40 40" width="32" height="32"><circle cx="20" cy="14" r="7" fill="rgba(255,255,255,.25)" stroke="rgba(255,255,255,.6)" stroke-width="1.5"/><path d="M12 32c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5"/><path d="M24 8l3-3m0 0l-3-3m3 3l3 3m-3-3l-3 3" stroke="#fff" stroke-width="1.3" stroke-linecap="round" opacity=".7"/><path d="M12 8l2-2m0 0l-2-2m2 2l2 2m-2-2l-2 2" stroke="#fff" stroke-width="1.3" stroke-linecap="round" opacity=".5"/></svg>',
+        "icon": '<svg viewBox="0 0 40 40" width="32" height="32"><circle cx="20" cy="14" r="7" fill="currentColor" fill-opacity=".15" stroke="currentColor" stroke-opacity=".5" stroke-width="1.5"/><path d="M12 32c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="none" stroke="currentColor" stroke-opacity=".5" stroke-width="1.5"/><path d="M24 8l3-3m0 0l-3-3m3 3l3 3m-3-3l-3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity=".7"/><path d="M12 8l2-2m0 0l-2-2m2 2l2 2m-2-2l-2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" opacity=".5"/></svg>',
         "color": "#27ae60",
         "desc": "Manter o local limpo"
     },
     "Seiketsu (Padronização)": {
-        "icon": '<svg viewBox="0 0 40 40" width="32" height="32"><circle cx="20" cy="14" r="7" fill="rgba(255,255,255,.25)" stroke="rgba(255,255,255,.6)" stroke-width="1.5"/><path d="M12 32c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5"/><rect x="14" y="5" width="12" height="8" rx="1.5" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M16 8h8M16 10.5h5" stroke="#fff" stroke-width="1" stroke-linecap="round"/></svg>',
+        "icon": '<svg viewBox="0 0 40 40" width="32" height="32"><circle cx="20" cy="14" r="7" fill="currentColor" fill-opacity=".15" stroke="currentColor" stroke-opacity=".5" stroke-width="1.5"/><path d="M12 32c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="none" stroke="currentColor" stroke-opacity=".5" stroke-width="1.5"/><rect x="14" y="5" width="12" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M16 8h8M16 10.5h5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>',
         "color": "#3498db",
         "desc": "Padronizar processos"
     },
     "Shitsuke (Disciplina)": {
-        "icon": '<svg viewBox="0 0 40 40" width="32" height="32"><circle cx="20" cy="14" r="7" fill="rgba(255,255,255,.25)" stroke="rgba(255,255,255,.6)" stroke-width="1.5"/><path d="M12 32c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5"/><path d="M17 6l3 3 6-6" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        "icon": '<svg viewBox="0 0 40 40" width="32" height="32"><circle cx="20" cy="14" r="7" fill="currentColor" fill-opacity=".15" stroke="currentColor" stroke-opacity=".5" stroke-width="1.5"/><path d="M12 32c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="none" stroke="currentColor" stroke-opacity=".5" stroke-width="1.5"/><path d="M17 6l3 3 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
         "color": "#9b59b6",
-        "desc": "Manter os habitos"
+        "desc": "Manter os hábitos"
     },
 }
 
@@ -593,7 +593,7 @@ def responsaveis_por_setor(setor_id):
 if __name__ == '__main__':
     init_db()
     print("\n" + "=" * 60)
-    print("  🏢 Programa 5S - Sistema de Auditorias")
-    print("  📊 Acesse: http://127.0.0.1:5000")
+    print("  🏢 Programa 5S – Sistema de Gerenciamento de Auditorias")
+    print("  📊 Acesse: http://127.0.0.1:5001")
     print("=" * 60 + "\n")
     app.run(debug=True, host='127.0.0.1', port=5001)

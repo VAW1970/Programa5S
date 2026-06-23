@@ -18,7 +18,7 @@ if errorlevel 1 (
 :: Navegar para a pasta do projeto
 cd /d "%~dp0"
 
-:: Verificar se as dependencias estao instaladas
+:: Verificar dependencias
 echo  [1/3] Verificando dependencias...
 pip show flask >nul 2>&1
 if errorlevel 1 (
@@ -31,12 +31,26 @@ if errorlevel 1 (
 echo.
 echo  [3/3] Iniciando servidor...
 echo  ============================================
-echo   Acesse: http://127.0.0.1:5001
-echo   Pressione CTRL+C para parar o servidor
+
+:: Mostrar IP local
+echo  IPs disponiveis na rede:
+ipconfig | findstr /R /C:"IPv4"
+
+echo.
+echo  Acesse pelo celular/tablet:
+echo  http://SEU_IP:5001
+echo  (substitua SEU_IP pelo IPv4 acima)
+echo.
+echo  Pressione CTRL+C para parar o servidor
 echo  ============================================
 echo.
 
-:: Iniciar o Flask
-python app.py
+:: Definir variaveis do Flask
+set FLASK_APP=app.py
+set FLASK_RUN_HOST=0.0.0.0
+set FLASK_RUN_PORT=5001
+
+:: Rodar Flask
+flask run
 
 pause
